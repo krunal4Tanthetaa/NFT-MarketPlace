@@ -6,7 +6,7 @@ import { GetIpfsUrlFromPinata } from "../FetchData/utils";
 import { IoMdClose } from "react-icons/io";
 import { PulseLoader } from "react-spinners";
 import { useNFTdata } from "../Context/NFTdata";
-import Dumy from "../data/images/dummy-prod-1.jpg";
+// import Dumy from "../data/images/dummy-prod-1.jpg";
 
 function NFTTile({ data, forSale = true, onClick }) {
     const {
@@ -29,20 +29,47 @@ function NFTTile({ data, forSale = true, onClick }) {
 
     return (
         <div>
-            <Link to={newTo} onClick={() => onClick?.()}>
-                <div className="rounded-lg  shadow-2xl">
-                    <img
-                        src={IPFSUrl ? IPFSUrl : Dumy}
-                        alt=""
-                        className="w-72 h-80 border border-[#3498DB] rounded-lg object-cover"
-                    />
+            {/* <div className=""> */}
+
+            <div className="relative group">
+                <div className="rounded-lg shadow-2xl overflow-hidden ">
+                    <Link to={newTo} onClick={() => onClick?.()}>
+                        <img
+                            src={IPFSUrl ? IPFSUrl : ""}
+                            alt=""
+                            className="w-72 h-80 border border-[#3498DB] rounded-lg object-cover hover:scale-125 transition duration-500 cursor-pointer"
+                        />
+                    </Link>
                     <div className=" w-full p-2 bg-gradient-to-t from-[#454545] to-transparent rounded-lg pt-5 -mt-20 text-center ">
-                        <strong className="font-semibold text-white text-lg">{data.name}</strong>
-                        <p className="display-inline text-[#ECF0F1]">{data.description}</p>
+                        <strong className="font-semibold text-white text-lg">
+                            {data.name}
+                        </strong>
+                        <p className="display-inline text-[#ECF0F1]">
+                            {data.description}
+                        </p>
                     </div>
-                </div>
-            </Link>
-            {!forSale && (
+                </div>{" "}
+                {!forSale && (
+                    <button
+                        onClick={() => (
+                            setListSale((list) => !list),
+                            setTokenId(data.tokenId)
+                        )}
+                        disabled={minLoading}
+                        class="invisible group-hover:visible absolute w-full h-1/5 rounded bottom-0 transition duration-500 bg-[#E74C3C] text-white"
+                    >
+                        <div className="realtive">
+                            <h1>Sale now</h1>
+                            <div className="absolute top-2 left-2">
+                                <MdSell />
+                            </div>
+                        </div>
+                    </button>
+                )}
+            </div>
+            {/* </div> */}
+
+            {/* {!forSale && (
                 <button
                     className="w-72 rounded-lg p-3 bg-blue-500 hover:bg-blue-600 inline-flex gap-16"
                     onClick={() => (
@@ -61,7 +88,7 @@ function NFTTile({ data, forSale = true, onClick }) {
                         </div>
                     )}
                 </button>
-            )}
+            )} */}
             {listSale && (
                 <>
                     <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2  bg-purple-400 w-96 h-auto rounded-xl">

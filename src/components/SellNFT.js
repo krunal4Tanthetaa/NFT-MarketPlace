@@ -1,6 +1,7 @@
 import Navbar from "./Navbar";
 import { useNFTdata } from "../Context/NFTdata";
 import { BeatLoader, PulseLoader } from "react-spinners";
+import Loading from "../ui/Loading";
 
 export default function SellNFT() {
     const {
@@ -10,26 +11,25 @@ export default function SellNFT() {
         formParams,
         minLoading,
         loading,
+        sideOpen,
     } = useNFTdata();
 
     return (
-        <div className="">
-            <Navbar />
+        <div
+            className={`flex flex-col  px-4 py-1  ${sideOpen ? "blur-sm" : ""}`}
+        >
+            {" "}
+            <div>
+                <Navbar />
+            </div>
             <div
                 className="flex flex-col place-items-center mt-10"
                 id="nftForm"
             >
                 {loading ? (
-                    <div className="mt-9">
-                        <div className="text-indigo-100 mb-2 ">
-                            <p>Please wait for transaction....</p>
-                        </div>
-                        <div className="ml-12">
-                            <BeatLoader color="#b943dd" margin={3} size={25} />
-                        </div>
-                    </div>
+                    <Loading />
                 ) : (
-                    <form className="bg-purple-200 shadow-md rounded-xl px-10 pt-4 pb-8 mb-4">
+                    <form className="bg-white shadow-md rounded-xl px-10 pt-4 pb-8 mb-4">
                         <h3 className="text-center font-bold text-purple-500 mb-8">
                             Upload your NFT to the marketplace
                         </h3>

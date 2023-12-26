@@ -5,7 +5,7 @@ import { FiAlertCircle } from "react-icons/fi";
 import { useNFTdata } from "../Context/NFTdata";
 import { MdDeleteForever } from "react-icons/md";
 
-import { BeatLoader, PulseLoader } from "react-spinners";
+import { PulseLoader } from "react-spinners";
 
 function Aside() {
     const {
@@ -25,10 +25,10 @@ function Aside() {
             <div className={`${loading ? "opacity-10" : ""}`}>
                 {createPortal(
                     <div
-                        className={`h-screen w-2/5 absolute top-0 right-0 grid justify-items-end p-8`}
+                        className={`h-screen w-2/5 absolute top-0 right-0 grid justify-items-end p-8 text-[#333333]`}
                     >
-                        <div className="relative h-full w-3/5 bg-white rounded-2xl !blur-none">
-                            <div className="border-b-2 flex justify-between h-20 items-center p-5">
+                        <div className="relative h-full w-3/5 bg-[#ffffffe1] rounded-2xl !blur-none">
+                            <div className="border-b-2 border-[#c5c5c5] flex justify-between h-20 items-center p-5">
                                 <p className="font-sans text-2xl font-bold flex items-center gap-2">
                                     Your cart{" "}
                                     <span>
@@ -41,7 +41,7 @@ function Aside() {
                             </div>
 
                             <div
-                                className={`flex flex-col border-b-2  px-5 pb-5 ${
+                                className={`flex flex-col border-b-2 border-[#c5c5c5]  px-5 pb-5 ${
                                     selectMulNFT.length == 0 ? "opacity-70" : ""
                                 }`}
                             >
@@ -58,7 +58,7 @@ function Aside() {
                                                 : "item"}
                                         </div>
                                         <div
-                                            className="hover:text-slate-400 cursor-pointer"
+                                            className="hover:text-[#747474] cursor-pointer"
                                             onClick={() => setselectMulNFT([])}
                                         >
                                             clear all
@@ -77,7 +77,7 @@ function Aside() {
                                             </div>
 
                                             <div className="flex gap-2 flex-col font-bold">
-                                                <p className="text-slate-700">
+                                                <p className="">
                                                     {nft.name}
                                                 </p>
                                                 <p>
@@ -87,10 +87,10 @@ function Aside() {
                                                     ) + "..."}
                                                 </p>
                                             </div>
-                                            <div className="ml-auto relative group  grid justify-end">
+                                            <div className="ml-auto relative group grid justify-end">
                                                 <div className="">
                                                     <button
-                                                        className="opacity-0 group-hover:opacity-100 duration-300 absolute inset-x-0 bottom-0 flex justify-center items-end text-xl bg-white text-black font-semibold"
+                                                        className="opacity-0 group-hover:opacity-100 duration-300 absolute inset-x-0 bottom-0 flex justify-center items-end text-xl  font-semibold"
                                                         onClick={() =>
                                                             setselectMulNFT(
                                                                 (e) =>
@@ -110,7 +110,7 @@ function Aside() {
                                                     </button>
                                                 </div>
                                                 <div>
-                                                    <p className="text-xl font-bold">
+                                                    <p className="text-xl font-bold group-hover:invisible">
                                                         {nft.price} MATIC
                                                     </p>
                                                 </div>
@@ -131,9 +131,9 @@ function Aside() {
                                         <p>{selectValue} MATIC</p>
                                     </div>
                                 </div>
-                                <div className="grid justify-center text-white">
+                                <div className="grid justify-center ">
                                     <button
-                                        className="bg-blue-500 rounded-2xl hover:bg-blue-600 p-4 px-20 w-full  border-r-2"
+                                        className="bg-[#27AE60] rounded-2xl hover:bg-[#219151] p-4 px-20 w-full text-white border-r-2"
                                         onClick={buyMultipleNFTs}
                                         disabled={minLoading}
                                     >

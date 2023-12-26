@@ -1,4 +1,4 @@
-import fullLogo from "../data/images/NFTDivinity.png";
+import fullLogo from "../data/images/MicrosoftTeams-image.png";
 import { Link } from "react-router-dom";
 import { useEffect } from "react";
 import { IoIosWallet } from "react-icons/io";
@@ -85,8 +85,8 @@ function Navbar() {
                                 <img
                                     src={fullLogo}
                                     alt=""
-                                    width={180}
-                                    height={140}
+                                    width={200}
+                                    height={170}
                                     className="inline-block -m-1"
                                 />
                             </Link>
