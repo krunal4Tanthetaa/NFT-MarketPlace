@@ -8,7 +8,7 @@ import { useLocation } from "react-router";
 
 import { createWeb3Modal, defaultConfig } from "@web3modal/ethers/react";
 import { useNFTdata } from "../Context/NFTdata";
-import Aside from "./Aside";
+import Aside from "./../ui/Aside";
 
 // 1. Get projectId at https://cloud.walletconnect.com
 const projectId = "17bf86727f5389ce321c4acaf68adec8";
@@ -58,6 +58,7 @@ function Navbar() {
         selectMulNFT,
         setSideOpen,
         sideOpen,
+        listSale,
     } = useNFTdata();
 
     const location = useLocation();
@@ -75,7 +76,7 @@ function Navbar() {
                     <div
                         onClick={() => setListSale(false)}
                         className={`flex justify-between items-center mt-5 opacity-90 bg-[#34495E] px-3 py-1 rounded-2xl shadow font-roboto ${
-                            loading || minLoading
+                            loading || minLoading || sideOpen || listSale
                                 ? "opacity-50 pointer-events-none"
                                 : ""
                         }`}

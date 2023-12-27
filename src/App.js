@@ -1,12 +1,11 @@
 import "./App.css";
-import { Routes, Route, BrowserRouter } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 
 import Marketplace from "./components/Marketplace";
 import Profile from "./components/Profile";
 import SellNFT from "./components/SellNFT";
 import NFTPage from "./components/NFTpage";
-import Aside from "./components/Aside";
 
 function App() {
     return (
@@ -16,7 +15,6 @@ function App() {
                 <Route path="/sellNFT" element={<SellNFT />} />
                 <Route path="/nftPage/:tokenId" element={<NFTPage />} />
                 <Route path="/profile" element={<Profile />} />
-                <Route path="/Aside" element={<Aside/>} />
             </Routes>
 
             <Toaster

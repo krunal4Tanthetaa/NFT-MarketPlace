@@ -76,7 +76,7 @@ export const NFTdataApi = ({ children }) => {
 
             // create an NFT Token
             let transaction = await contract.getAllNFTs();
-            console.log(transaction)
+            console.log(transaction);
 
             //Fetch all the details of every NFT from the contract and display
             const items = await Promise.all(
@@ -113,13 +113,14 @@ export const NFTdataApi = ({ children }) => {
 
     async function onChangeFile(e) {
         let file = e.target.files[0];
-        setMinLoading(true);
+        setWait(true);
+
         try {
             const response = await uploadFileToIPFS(file);
             if (response.success === true) {
                 console.log("Uploaded image to pinata:", response.pinataURL);
                 setFileURL(response.pinataURL);
-                setMinLoading(false);
+                setWait(false);
             }
         } catch (e) {
             console.log("Error during file upload", e);
@@ -129,6 +130,7 @@ export const NFTdataApi = ({ children }) => {
                 description: "",
                 price: "",
             });
+            setWait(false);
             setMinLoading(false);
         }
     }
@@ -172,19 +174,21 @@ export const NFTdataApi = ({ children }) => {
             let transaction = await contract.createToken(metadataURL, price, {
                 value: listingPrice,
             });
+            setMinLoading(false);
             setLoading(true);
             await transaction.wait();
 
             toast.success("Successfully listed your NFT!");
 
             setLoading(false);
-            setMinLoading(false);
             setFormParams({ name: "", description: "", price: "" });
+            setFileURL(null);
             await userNFTdata();
             await getAllNFTs();
 
             navigate("/profile");
         } catch (error) {
+            setFileURL(null);
             console.log(error);
             if (error.reason == "rejected") {
                 toast.error(`Error message ${error.reason}`);
@@ -261,6 +265,7 @@ export const NFTdataApi = ({ children }) => {
             let transaction = await contract.ListingToSale(tokenId, price, {
                 value: listingPrice,
             });
+            setMinLoading(false);
             setLoading(true);
             await transaction.wait();
 
@@ -280,17 +285,7 @@ export const NFTdataApi = ({ children }) => {
                 setListPrice("");
                 setWait(false);
             } else {
-                toast.success("Wait up to 10 secons...");
-                setTimeout(() => {
-                    getAllNFTs();
-                    userNFTdata();
-                    setWait(false);
-                    setLoading(false);
-                    setListPrice("");
-                    navigate("/Profile");
-                    toast.success("You successfully listed your NFT!");
-                    console.log("Delayed for 1 second.");
-                }, 20000);
+                toast.success("something went wrong please try later..");
             }
         }
     }
@@ -305,12 +300,12 @@ export const NFTdataApi = ({ children }) => {
             console.log(selectValue);
 
             let AllId = [];
-            selectMulNFT.map(nft => AllId.push(nft.tokenId));
+            selectMulNFT.map((nft) => AllId.push(nft.tokenId));
 
             // console.log(TotalValue);
 
-             const salePrice = parseUnits(selectValue.toString(), 18);
-             console.log(salePrice);
+            const salePrice = parseUnits(selectValue.toString(), 18);
+            console.log(salePrice);
 
             // console.log(salePrice);
             // // //run the executeSale function
@@ -318,6 +313,7 @@ export const NFTdataApi = ({ children }) => {
                 value: salePrice,
             });
 
+            setMinLoading(false);
             setLoading(true);
             await transaction.wait();
 
@@ -333,15 +329,13 @@ export const NFTdataApi = ({ children }) => {
             navigate("/profile");
         } catch (error) {
             setselectMulNFT([]);
-            if (error.reason == "rejected") {
-                toast.error(`Error message ${error.reason}`);
-                setListPrice("");
-                setMinLoading(false);
-                setLoading(false);
-            } else {
-                toast.error(`Error message ${error.reason}`);
-                console.log(error);
-            }
+            setListPrice("");
+            setMinLoading(false);
+            setLoading(false);
+
+            toast.error(`Error message ${error.reason}`);
+
+            console.log(error);
         }
     }
 
@@ -354,8 +348,10 @@ export const NFTdataApi = ({ children }) => {
 
     useEffect(() => {
         setSelectValue(0);
-          selectMulNFT.map((nft) => (setSelectValue(e => e += Number(nft.price))  ));
-    },[selectMulNFT])
+        selectMulNFT.map((nft) =>
+            setSelectValue((e) => (e += Number(nft.price)))
+        );
+    }, [selectMulNFT]);
 
     return (
         <nftContext.Provider
@@ -382,6 +378,7 @@ export const NFTdataApi = ({ children }) => {
                 selectMulNFT,
                 sideOpen,
                 selectValue,
+                fileURL,
                 // setState data
                 setFormParams,
                 setLoading,
