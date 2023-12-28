@@ -10,8 +10,8 @@ function Loading() {
             {loading ? (
                 <div>
                     {createPortal(
-                        <div className="text-center absolute top-1/2 right-1/2">
-                            <BeatLoader color="#3498DB" size={25} />
+                        <div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                            <BeatLoader color="#ffff" size={25} />
                         </div>,
                         document.body
                     )}

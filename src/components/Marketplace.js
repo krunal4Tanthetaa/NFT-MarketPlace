@@ -7,8 +7,8 @@ import Loading from "../ui/Loading";
 import MainDiv from "../ui/MainDiv";
 
 export default function Marketplace() {
-
-    const { AllNft, isConnected, setOneNFTdata } = useNFTdata();
+    const { AllNft, isConnected, setOneNFTdata, setEditPopup, editPopup } =
+        useNFTdata();
 
     return (
         <>

@@ -11,13 +11,13 @@ import Title from "../ui/Form-ui/FormTitle";
 
 export default function SellNFT() {
     return (
-        <MainDiv gap={20}>
+        <MainDiv>
             <div>
                 <Navbar />
             </div>
-            <div className="max-h-[520px] ">
+            <div className="m-20 p-12">
                 <Loading />
-                <form className="w-3/5 grid-rows-1 grid grid-cols-2 justify-center bg-white mx-auto  rounded-xl overflow-hidden">
+                <form className="w-3/5 grid-rows-1 grid grid-cols-2  bg-white mx-auto  rounded-xl overflow-hidden">
                     <Image />
 
                     <div class="border-b border-gray-900/10 px-12 relative flex flex-col justify-center text-[#333333] font-roboto text-base font">

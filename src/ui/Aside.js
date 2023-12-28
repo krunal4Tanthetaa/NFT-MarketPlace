@@ -17,7 +17,6 @@ function Aside() {
         buyMultipleNFTs,
         selectValue,
         minLoading,
-        loading,
     } = useNFTdata();
 
     console.log(selectMulNFT);
@@ -43,7 +42,7 @@ function Aside() {
         <>
             {createPortal(
                 <div
-                    className={`h-screen  2xl:w-1/4 absolute top-0 right-0 grid justify-items-end p-8 text-[#333333] `}
+                    className={`h-screen  2xl:w-1/4 absolute top-0 right-0 grid justify-items-end p-8 text-[#333333] ${minLoading ? "opacity-80 pointer-events-none" : ""}`}
                     ref={Ref}
                 >
                     <div className="relative h-full w-full bg-[#ffffffe1] rounded-2xl !blur-none">
@@ -96,7 +95,7 @@ function Aside() {
                                         </div>
 
                                         <div className="flex flex-col font-bold">
-                                            <p className="">{nft.name}</p>
+                                            <p className="">{nft.name.substr(0, 5) + ".." + nft.name.substr(-2)}</p>
                                             <p>
                                                 {nft.description.substr(0, 12) +
                                                     "..."}
@@ -123,7 +122,7 @@ function Aside() {
                                             </div>
                                             <div>
                                                 <p className="text-xl font-bold group-hover:invisible">
-                                                    {nft.price} MATIC
+                                                    {nft?.price} MATIC
                                                 </p>
                                             </div>
                                         </div>

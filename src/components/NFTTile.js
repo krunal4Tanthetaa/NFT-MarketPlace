@@ -41,7 +41,7 @@ function NFTTile({ data, forSale = true, onClick }) {
                                 setTokenId(data.tokenId)
                             )}
                             disabled={minLoading}
-                            class="invisible group-hover:visible absolute w-full h-1/5 rounded bottom-0 transition duration-500 bg-[#E74C3C] text-white"
+                            class="invisible group-hover:visible absolute w-full h-1/5 rounded bottom-0 transition duration-500 bg-[#E74C3C] text-white font-base text-lg"
                         >
                             {wait && data.tokenId == tokenId ? (
                                 <div className="text-xl text-semibold text-center">

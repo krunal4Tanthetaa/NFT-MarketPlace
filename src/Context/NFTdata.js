@@ -56,6 +56,9 @@ export const NFTdataApi = ({ children }) => {
     const [sideOpen, setSideOpen] = useState(false);
     const [selectValue, setSelectValue] = useState();
 
+    // Edit LISTINg logic
+    const [editPopup, setEditPopup] = useState(false);
+
     async function MarketPlaceContract() {
         const provider = new BrowserProvider(walletProvider);
         const signer = await provider.getSigner();
@@ -108,6 +111,49 @@ export const NFTdataApi = ({ children }) => {
             setLoading(false);
         } catch (error) {
             console.log(error);
+        }
+    }
+
+    async function buyNFT(price, _tokenId) {
+        try {
+            setMinLoading(true);
+            const contract = await MarketPlaceContract();
+
+            const salePrice = parseUnits(price.toString(), "ether");
+
+            console.log(tokenId, salePrice, contract);
+
+            //run the executeSale function
+            let transaction = await contract.executeSale(_tokenId, {
+                value: salePrice,
+                gasLimit: 20000000,
+            });
+
+            setMinLoading(false);
+            setLoading(true);
+            await transaction.wait();
+
+            toast.success("You successfully bought the NFT!");
+            setLoading(false);
+
+            // const abc = await getAllNFTs();
+            // const aaa = await userNFTdata();
+            await getAllNFTs();
+            await userNFTdata();
+
+            // if (abc && aaa) {
+            navigate("/profile");
+            // }
+        } catch (error) {
+            if (error.reason == "rejected") {
+                toast.error(`Error message ${error.reason}`);
+                setListPrice("");
+                setMinLoading(false);
+                setLoading(false);
+            } else {
+                console.log(error);
+                toast.error(`Error message ${error.reason}`);
+            }
         }
     }
 
@@ -267,6 +313,7 @@ export const NFTdataApi = ({ children }) => {
             });
             setMinLoading(false);
             setLoading(true);
+            setListSale(false);
             await transaction.wait();
 
             toast.success("Successfully listed your NFT!");
@@ -287,6 +334,36 @@ export const NFTdataApi = ({ children }) => {
             } else {
                 toast.success("something went wrong please try later..");
             }
+        }
+    }
+
+    async function unlistNFT(_tokenId) {
+        try {
+            setMinLoading(true);
+
+            const contract = await MarketPlaceContract();
+            console.log(_tokenId);
+            //create an NFT Token
+            let transaction = await contract.unlistNFT(_tokenId);
+
+            setLoading(true);
+            setEditPopup(false);
+            await transaction.wait();
+            toast.success("succesfully unlist NFT");
+
+            setTokenId(0);
+            await getAllNFTs();
+            await userNFTdata();
+            setLoading(false);
+            setMinLoading(false);
+
+            navigate("/profile");
+        } catch (error) {
+            console.log(error);
+            setLoading(false);
+            setMinLoading(false);
+            setTokenId(0);
+            toast.error("something went wrong");
         }
     }
 
@@ -313,6 +390,7 @@ export const NFTdataApi = ({ children }) => {
                 value: salePrice,
             });
 
+            setSideOpen(false);
             setMinLoading(false);
             setLoading(true);
             await transaction.wait();
@@ -364,6 +442,8 @@ export const NFTdataApi = ({ children }) => {
                 getAllNFTs,
                 userNFTdata,
                 buyMultipleNFTs,
+                buyNFT,
+                unlistNFT,
                 // State Data
                 AllNft,
                 userNFT,
@@ -379,6 +459,7 @@ export const NFTdataApi = ({ children }) => {
                 sideOpen,
                 selectValue,
                 fileURL,
+                editPopup,
                 // setState data
                 setFormParams,
                 setLoading,
@@ -389,6 +470,7 @@ export const NFTdataApi = ({ children }) => {
                 setTokenId,
                 setselectMulNFT,
                 setSideOpen,
+                setEditPopup,
                 // Wallet connect hooks
                 isConnected,
                 chainId,
