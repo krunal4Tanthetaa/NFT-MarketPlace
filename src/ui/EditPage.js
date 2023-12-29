@@ -6,8 +6,7 @@ import MiniLoader from "./Miniloader";
 import { IoMdClose } from "react-icons/io";
 
 function EditPage() {
-    const { setEditPopup, unlistNFT, minLoading, tokenId, setTokenId } =
-        useNFTdata();
+    const { unlistNFT, state, dispatch, setNewPrice } = useNFTdata();
 
     const Ref = useRef();
 
@@ -15,7 +14,7 @@ function EditPage() {
         function () {
             function handleClick(e) {
                 if (Ref.current && !Ref.current.contains(e.target)) {
-                    setEditPopup(false);
+                    dispatch({ type: "editPopup" });
                 }
             }
 
@@ -24,7 +23,7 @@ function EditPage() {
             return () =>
                 document.removeEventListener("click", handleClick, true);
         },
-        [setEditPopup, Ref]
+        [Ref]
     );
 
     return (
@@ -35,29 +34,28 @@ function EditPage() {
                     ref={Ref}
                 >
                     <div className="text-right absolute top-3 right-5">
-                        <button
-                            onClick={() => (
-                                setEditPopup((list) => !list), setTokenId(0)
-                            )}
-                        >
+                        <button onClick={() => dispatch({ type: "editPopup" })}>
                             <IoMdClose size={25} />
                         </button>
                     </div>
                     <div className="w-3/4 pt-5 text-lg flex flex-col ">
                         <EditPrice />
                         <div className="flex justify-end">
-                            <button className="p-3 w-2/4 bg-slate-400 text-white rounded mt-2">
-                                Edit Price
+                            <button
+                                onClick={() => setNewPrice(state.tokenId)}
+                                className="p-3 w-2/4 bg-slate-400 text-white rounded mt-2"
+                            >
+                                {state.wait ? <MiniLoader /> : "Edit Price"}
                             </button>
                         </div>
                     </div>
 
                     <button
-                        disabled={minLoading}
-                        onClick={() => unlistNFT(tokenId)}
+                        disabled={state.isMinLoading}
+                        onClick={() => unlistNFT(state.tokenId)}
                         className="w-3/4 p-5 rounded-lg bg-[#E74C3C] hover:bg-[#C0392B] text-[#ffffffab] hover:text-[#ffff]  mb-7 text-xl"
                     >
-                        {minLoading ? <MiniLoader /> : "Unlist NFT"}
+                        {state.isMinLoading ? <MiniLoader /> : "Unlist NFT"}
                     </button>
                 </div>,
                 document.body

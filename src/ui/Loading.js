@@ -3,11 +3,11 @@ import { BeatLoader } from "react-spinners";
 import { useNFTdata } from "../Context/NFTdata";
 
 function Loading() {
-    const { loading } = useNFTdata();
+    const { state } = useNFTdata();
 
     return (
         <>
-            {loading ? (
+            {state.isLoading ? (
                 <div>
                     {createPortal(
                         <div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">

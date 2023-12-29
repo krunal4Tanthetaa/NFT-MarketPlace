@@ -8,7 +8,7 @@ import Popup from "../ui/Popup";
 import MainDiv from "../ui/MainDiv";
 
 export default function Profile() {
-    const { address, userNFT: data, setOneNFTdata, listSale } = useNFTdata();
+    const { address, state, dispatch } = useNFTdata();
 
     return (
         <MainDiv>
@@ -28,13 +28,18 @@ export default function Profile() {
                 </div>
                 <div className="max-w-full p-10 pt-4">
                     <div className="grid grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-8 gap-y-9">
-                        {data.map((value, index) => {
+                        {state.ProfileNFT.map((value, index) => {
                             return (
                                 <NFTTile
                                     data={value}
                                     key={index}
                                     forSale={value.isForSale}
-                                    onClick={() => setOneNFTdata(value)}
+                                    onClick={() =>
+                                        dispatch({
+                                            type: "setOneNFT",
+                                            payload: value,
+                                        })
+                                    }
                                 ></NFTTile>
                             );
                         })}
@@ -42,7 +47,7 @@ export default function Profile() {
                 </div>
             </div>
             <Loading />
-            {listSale && <Popup />}
+            {state.popUpSale && <Popup />}
         </MainDiv>
     );
 }

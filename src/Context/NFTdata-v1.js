@@ -15,14 +15,33 @@ import { GetIpfsUrlFromPinata } from "../FetchData/utils";
 import MarketplaceJSON from "../FetchData/Marketplace.json";
 import { uploadFileToIPFS, uploadJSONToIPFS } from "../FetchData/pinata";
 import toast from "react-hot-toast";
-import { reducer , initialState } from "../Hooks/reducerHook";
+import { reducer } from "../Hooks/reducerHook";
 
 const nftContext = createContext();
 
+const initialState = {
+    isLoading: false,
+    isMinLoading: false,
+    AllNft: [],
+    oneNFT: {},
+    fileURL: null,
+    formParams: {
+        name: "",
+        description: "",
+        price: "",
+    },
+    ProfileNFT: [],
+    popUpSale: false,
+    popUpSide: false,
+    popUpEdit: false,
+    salePrice: "",
+    wait: false,
+    tokenId: "",
+    selectMulNFT: [],
+    selectValue: 0,
+};
 
 export const NFTdataApi = ({ children }) => {
-
-    // useReducer hook for state manegment
     const [state, dispatch] = useReducer(reducer, initialState);
 
     // Wallet connect hook
@@ -32,6 +51,7 @@ export const NFTdataApi = ({ children }) => {
     const { open, close } = useWeb3Modal();
 
     const navigate = useNavigate();
+    // useState Hook
 
     async function MarketPlaceContract() {
         const provider = new BrowserProvider(walletProvider);
@@ -105,10 +125,9 @@ export const NFTdataApi = ({ children }) => {
 
             await getAllNFTs();
             await userNFTdata();
-
-            dispatch({ type: "transactionSuccess" });
             toast.success("You successfully bought the NFT!");
 
+            dispatch({ type: "transactionSuccess" });
             navigate("/profile");
         } catch (error) {
             dispatch({ type: "transactionFail" });
@@ -167,7 +186,7 @@ export const NFTdataApi = ({ children }) => {
 
     async function listNFT(e) {
         e.preventDefault();
-        dispatch({ type: "Load" });
+        dispatch({ type: "MiniLoad" });
 
         try {
             const metadataURL = await uploadMetadataToIPFS();
@@ -186,8 +205,8 @@ export const NFTdataApi = ({ children }) => {
 
             await transaction.wait();
 
-            await getAllNFTs();
             await userNFTdata();
+            await getAllNFTs();
 
             toast.success("Successfully listed your NFT!");
             dispatch({ type: "transactionSuccess" });
@@ -254,6 +273,7 @@ export const NFTdataApi = ({ children }) => {
             listingPrice = listingPrice.toString();
 
             const price = parseUnits(state.salePrice, 18);
+            // console.log(contract, tokenId, price, listingPrice);
 
             let transaction = await contract.ListingToSale(
                 state.tokenId,
@@ -283,7 +303,7 @@ export const NFTdataApi = ({ children }) => {
             if (error.reason == "rejected") {
                 toast.error(`Error message ${error.reason}`);
             } else {
-                toast.error("something went wrong please try later..");
+                toast.success("something went wrong please try later..");
             }
         }
     }
@@ -353,46 +373,18 @@ export const NFTdataApi = ({ children }) => {
         }
     }
 
-    async function setNewPrice(_tokenId) {
-
-        if(!state.salePrice) return
-
-        try {
-            dispatch({ type: "LoadWait" });
-
-            const contract = await MarketPlaceContract();
-
-            const price = parseUnits(state.salePrice, 18);
-
-            let transaction = await contract.EditPrice(_tokenId , price);
-
-            dispatch({ type: "transactionWait" });
-
-            await transaction.wait();
-
-            await getAllNFTs();
-            await userNFTdata();
-            toast.success("succesfully Edit Price");
-
-            dispatch({ type: "unListTransaction" });
-
-            navigate("/profile");
-        } catch (error) {
-            console.log(error);
-            dispatch({ type: "unListTransaction" });
-            toast.error("something went wrong");
-        }
-    }
-
     useEffect(() => {
         if (isConnected) {
             getAllNFTs();
             userNFTdata();
         }
-    }, [isConnected, selectedNetworkId, chainId, address]);
+    }, [isConnected, selectedNetworkId, chainId]);
 
     useEffect(() => {
-        dispatch({ type: "setSelectValue" });
+        dispatch({ type: "setSelectValue", payload: 0 });
+        state.selectMulNFT.map((nft) =>
+            dispatch({ type: "setSelectValue", payload: nft.price })
+        );
     }, [state.selectMulNFT]);
 
     return (
@@ -410,7 +402,6 @@ export const NFTdataApi = ({ children }) => {
                 buyMultipleNFTs,
                 buyNFT,
                 unlistNFT,
-                setNewPrice,
                 // Wallet connect hooks
                 isConnected,
                 chainId,

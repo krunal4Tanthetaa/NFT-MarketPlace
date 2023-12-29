@@ -5,7 +5,7 @@ import { useNFTdata } from "../Context/NFTdata";
 import { PulseLoader } from "react-spinners";
 
 function NFTTile({ data, forSale = true, onClick }) {
-    const { minLoading, setListSale, setTokenId, wait, tokenId } = useNFTdata();
+    const { state, dispatch } = useNFTdata();
 
     const newTo = {
         pathname: "/nftPage/" + data.tokenId,
@@ -36,14 +36,16 @@ function NFTTile({ data, forSale = true, onClick }) {
                     </div>{" "}
                     {!forSale && (
                         <button
-                            onClick={() => (
-                                setListSale((list) => !list),
-                                setTokenId(data.tokenId)
-                            )}
-                            disabled={minLoading}
+                            onClick={() =>
+                                dispatch({
+                                    type: "setSalePopup",
+                                    payload: data.tokenId,
+                                })
+                            }
+                            disabled={state.isMinLoading}
                             class="invisible group-hover:visible absolute w-full h-1/5 rounded bottom-0 transition duration-500 bg-[#E74C3C] text-white font-base text-lg"
                         >
-                            {wait && data.tokenId == tokenId ? (
+                            {state.wait && data.tokenId == state.tokenId ? (
                                 <div className="text-xl text-semibold text-center">
                                     <PulseLoader
                                         className="ml-5"

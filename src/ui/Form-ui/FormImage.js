@@ -2,19 +2,19 @@ import { useNFTdata } from "../../Context/NFTdata";
 import MiniLoader from "../Miniloader";
 
 function NFTupload() {
-    const { fileURL, wait, onChangeFile } = useNFTdata();
+    const { state, onChangeFile } = useNFTdata();
 
     return (
         <div className="flex items-center justify-center border p-10">
-            {fileURL ? (
+            {state.fileURL ? (
                 <div className="">
                     <img
-                        src={fileURL}
+                        src={state.fileURL}
                         alt=""
                         className="h-fit w-fit rounded-xl"
                     />
                 </div>
-            ) : wait ? (
+            ) : state.wait ? (
                 <MiniLoader color="#3498DB" />
             ) : (
                 <div class="mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10">

@@ -1,26 +1,23 @@
-import { MdOutlineRemoveShoppingCart, MdOutlineShoppingCart } from "react-icons/md";
+import {
+    MdOutlineRemoveShoppingCart,
+    MdOutlineShoppingCart,
+} from "react-icons/md";
 import { useNFTdata } from "../Context/NFTdata";
 import MiniLoader from "./Miniloader";
 
-
-
-
 function BuyButton() {
-
-    const { minLoading, setselectMulNFT, oneNFTdata: data, selectMulNFT , buyNFT} = useNFTdata();
-
-
+    const { buyNFT, state, dispatch } = useNFTdata();
 
     return (
         <div className="flex">
             <button
                 className="bg-[#27AE60] rounded-xl hover:bg-[#219151] p-4  w-96 rounded-r-none border-r-2 text-[#FFFFFF]"
-                onClick={() => buyNFT(data.price , data.tokenId)}
-                disabled={minLoading}
+                onClick={() => buyNFT(state.oneNFT.price, state.oneNFT.tokenId)}
+                disabled={state.isLoading}
             >
-                {minLoading ? (
+                {state.isMinLoading ? (
                     <div className="flex gap-5 justify-center">
-                        <MiniLoader/>
+                        <MiniLoader />
                     </div>
                 ) : (
                     <div className="flex gap-5 justify-center text-lg font-bold">
@@ -32,15 +29,11 @@ function BuyButton() {
             </button>
             <button
                 onClick={() =>
-                    setselectMulNFT((ids) =>
-                        ids.includes(data)
-                            ? ids.filter((id) => id != data)
-                            : [...ids, data]
-                    )
+                    dispatch({ type: "addMulNFT", payload: state.oneNFT })
                 }
                 className={`bg-[#27AE60] rounded-2xl hover:bg-[#219151]  p-4 w-46 rounded-l-none text-[#FFFFFF]`}
             >
-                {selectMulNFT.includes(data) ? (
+                {state.selectMulNFT.includes(state.oneNFT) ? (
                     <MdOutlineRemoveShoppingCart size={30} />
                 ) : (
                     <MdOutlineShoppingCart size={30} />

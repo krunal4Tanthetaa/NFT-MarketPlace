@@ -9,20 +9,13 @@ import BuyButton from "../ui/BuyButton";
 import EditPage from "../ui/EditPage";
 
 export default function NFTPage() {
-    const {
-        address,
-        oneNFTdata: data,
-        listSale,
-        editPopup,
-        setEditPopup,
-        setTokenId,
-    } = useNFTdata();
+    const { address, state, dispatch } = useNFTdata();
 
     const loginAddress = address?.toLowerCase() ?? "";
-    const dataAddress = data?.owner?.toLowerCase() ?? "";
+    const dataAddress = state.oneNFT?.owner?.toLowerCase() ?? "";
 
-    if (typeof data.image == "string")
-        data.image = GetIpfsUrlFromPinata(data.image);
+    if (typeof state.oneNFT.image == "string")
+        state.oneNFT.image = GetIpfsUrlFromPinata(state.oneNFT.image);
 
     return (
         <MainDiv gap={12}>
@@ -35,7 +28,7 @@ export default function NFTPage() {
                 <div className="grid grid-cols-2 max-w-full">
                     <div className="flex justify-center">
                         <img
-                            src={data.image}
+                            src={state.oneNFT.image}
                             alt=""
                             className="rounded-3xl h-[410] w-[410] 2xl:h-[710px] 2xl:w-[710px] shadow-2xl shadow-black r"
                         />
@@ -44,16 +37,16 @@ export default function NFTPage() {
                         <div className="text-xl space-y-4 text-white h-fit p-5 w-10/12 shadow shadow-[black] relative rounded-lg flex flex-col">
                             <div className="flex">
                                 <div className="shadow-md  shadow-black w-auto p-4 text-center text-[#ffffff] text-xl rounded-2xl font-mono font-semibold">
-                                    # {data.name}
+                                    # {state.oneNFT.name}
                                 </div>
                             </div>
 
                             <div className="shadow shadow-black w-fit p-5 rounded-xl font-mono text-sm text-indigo-100">
                                 <div>Owned by</div>
-                                <div className="text-[#3498DB]">{`${data?.owner?.slice(
+                                <div className="text-[#3498DB]">{`${state.oneNFT?.owner?.slice(
                                     0,
                                     9
-                                )}....${data?.owner?.slice(-10)}`}</div>
+                                )}....${state.oneNFT?.owner?.slice(-10)}`}</div>
                             </div>
 
                             <div className="flex">
@@ -63,9 +56,9 @@ export default function NFTPage() {
                                     </div>
                                     <div>
                                         <p>
-                                            {data.description} It is a long
-                                            established fact that a reader will
-                                            be distracted by the readable
+                                            {state.oneNFT.description} It is a
+                                            long established fact that a reader
+                                            will be distracted by the readable
                                             content of a page when looking at
                                             its layout. The point of using Lorem
                                             Ipsum is that it has a more-or-less
@@ -83,7 +76,7 @@ export default function NFTPage() {
 
                             <div className="mr-10 font-bold text-indigo-50 text-xl w-8/12">
                                 {loginAddress !== dataAddress ? (
-                                    data.isForSale ? (
+                                    state.oneNFT.isForSale ? (
                                         <div className="shadow shadow-[#000000] w-full p-5 rounded-xl  mt-4 ">
                                             <div className="text-xs text-indigo-100 ml-2 ">
                                                 <h1 className="font-normal">
@@ -91,7 +84,9 @@ export default function NFTPage() {
                                                 </h1>
                                             </div>
                                             <div className="font-semibold ml-2 font-sans h-10 text-4xl mb-2">
-                                                <h1>{data.price} MATIC</h1>
+                                                <h1>
+                                                    {state.oneNFT.price} MATIC
+                                                </h1>
                                             </div>
                                             <BuyButton />
                                         </div>
@@ -102,7 +97,7 @@ export default function NFTPage() {
                                             </div>
                                         </div>
                                     )
-                                ) : !data.isForSale ? (
+                                ) : !state.oneNFT.isForSale ? (
                                     <div className="shadow shadow-black w-96 p-5 rounded-2xl font-mono mt-8 flex flex-col items-center">
                                         <div className="text-white-700">
                                             <h1 className="m-3">
@@ -119,20 +114,26 @@ export default function NFTPage() {
                                     </div>
                                 )}
                             </div>
-                            {data.isForSale && loginAddress == dataAddress && (
-                                <button
-                                    onClick={() => (setEditPopup(true),setTokenId(data.tokenId))}
-                                    className="shadow shadow-[#000] w-60 p-5 absolute top-0 right-7 rounded-2xl text-center bg-[#1F618D] font-mono"
-                                >
-                                    Edit Listing
-                                </button>
-                            )}
+                            {state.oneNFT.isForSale &&
+                                loginAddress == dataAddress && (
+                                    <button
+                                        onClick={() =>
+                                            dispatch({
+                                                type: "setEditPopup",
+                                                payload: state.oneNFT.tokenId,
+                                            })
+                                        }
+                                        className="shadow shadow-[#000] w-60 p-5 absolute top-0 right-7 rounded-2xl text-center bg-[#1F618D] hover:bg-[#1f618d9c] font-mono"
+                                    >
+                                        Edit Listing
+                                    </button>
+                                )}
                         </div>
                     </div>
                 </div>
-                {editPopup && <EditPage />}
+                {state.popUpEdit && <EditPage />}
 
-                {listSale && <Popup />}
+                {state.popUpSale && <Popup />}
             </div>
         </MainDiv>
     );

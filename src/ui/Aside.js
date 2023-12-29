@@ -10,16 +10,9 @@ import { PulseLoader } from "react-spinners";
 import Loading from "./Loading";
 
 function Aside() {
-    const {
-        setSideOpen,
-        setselectMulNFT,
-        selectMulNFT,
-        buyMultipleNFTs,
-        selectValue,
-        minLoading,
-    } = useNFTdata();
+    const { state, dispatch, buyMultipleNFTs } = useNFTdata();
 
-    console.log(selectMulNFT);
+    // console.log(selectMulNFT);
 
     const Ref = useRef();
 
@@ -27,7 +20,7 @@ function Aside() {
         function () {
             function handleClick(e) {
                 if (Ref.current && !Ref.current.contains(e.target)) {
-                    setSideOpen(false);
+                    dispatch({ type: "sidePopup" });
                 }
             }
 
@@ -35,14 +28,18 @@ function Aside() {
             return () =>
                 document.removeEventListener("click", handleClick, true);
         },
-        [setSideOpen, Ref]
+        [Ref]
     );
 
     return (
         <>
             {createPortal(
                 <div
-                    className={`h-screen  2xl:w-1/4 absolute top-0 right-0 grid justify-items-end p-8 text-[#333333] ${minLoading ? "opacity-80 pointer-events-none" : ""}`}
+                    className={`h-screen  2xl:w-1/4 absolute top-0 right-0 grid justify-items-end p-8 text-[#333333] ${
+                        state.isMinLoading
+                            ? "opacity-80 pointer-events-none"
+                            : ""
+                    }`}
                     ref={Ref}
                 >
                     <div className="relative h-full w-full bg-[#ffffffe1] rounded-2xl !blur-none">
@@ -53,37 +50,43 @@ function Aside() {
                                     <FiAlertCircle size={20} />
                                 </span>
                             </p>
-                            <button onClick={() => setSideOpen((e) => !e)}>
+                            <button
+                                onClick={() => dispatch({ type: "sidePopup" })}
+                            >
                                 <IoClose size={30} />
                             </button>
                         </div>
 
                         <div
                             className={`flex flex-col border-b-2 border-[#c5c5c5]  px-5 pb-5 gap-3 ${
-                                selectMulNFT.length == 0 ? "opacity-70" : ""
+                                state.selectMulNFT.length == 0
+                                    ? "opacity-70"
+                                    : ""
                             }`}
                         >
-                            {selectMulNFT.length == 0 ? (
+                            {state.selectMulNFT.length == 0 ? (
                                 <div className="flex justify-center items-center h-40 space-x-9 p-5 font-medium text-gray-400">
                                     <p>Add items to get started</p>
                                 </div>
                             ) : (
                                 <div className="flex px-2 pt-4 pb-3 justify-between text-base font-semibold">
                                     <div>
-                                        {selectMulNFT.length}{" "}
-                                        {selectMulNFT.length > 1
+                                        {state.selectMulNFT.length}{" "}
+                                        {state.selectMulNFT.length > 1
                                             ? "items"
                                             : "item"}
                                     </div>
                                     <div
                                         className="hover:text-[#747474] cursor-pointer"
-                                        onClick={() => setselectMulNFT([])}
+                                        onClick={() =>
+                                            dispatch({ type: "clearMulNFT" })
+                                        }
                                     >
                                         clear all
                                     </div>
                                 </div>
                             )}
-                            {selectMulNFT.map((nft) => {
+                            {state.selectMulNFT.map((nft) => {
                                 return (
                                     <div className="p-2 flex rounded-lg gap-5 items-center group hover:bg-[#ffffff60] hover:drop-shadow-sm shadow-[#000]">
                                         <div className="shadow-xl h-20 w-20 overflow-hidden rounded-xl">
@@ -95,7 +98,11 @@ function Aside() {
                                         </div>
 
                                         <div className="flex flex-col font-bold">
-                                            <p className="">{nft.name.substr(0, 5) + ".." + nft.name.substr(-2)}</p>
+                                            <p className="">
+                                                {nft.name.substr(0, 5) +
+                                                    ".." +
+                                                    nft.name.substr(-2)}
+                                            </p>
                                             <p>
                                                 {nft.description.substr(0, 12) +
                                                     "..."}
@@ -106,13 +113,10 @@ function Aside() {
                                                 <button
                                                     className="opacity-0 group-hover:opacity-100 duration-300 absolute inset-x-0 bottom-0 flex justify-center items-end text-xl  font-semibold"
                                                     onClick={() =>
-                                                        setselectMulNFT((e) =>
-                                                            e.filter(
-                                                                (oneNft) =>
-                                                                    oneNft !==
-                                                                    nft
-                                                            )
-                                                        )
+                                                        dispatch({
+                                                            type: "setMulNFT",
+                                                            payload: nft,
+                                                        })
                                                     }
                                                 >
                                                     <MdDeleteForever
@@ -133,22 +137,24 @@ function Aside() {
 
                         <div
                             className={`flex flex-col gap-4 ${
-                                selectMulNFT.length == 0 ? "opacity-30" : ""
+                                state.selectMulNFT.length == 0
+                                    ? "opacity-30"
+                                    : ""
                             }`}
                         >
                             <div className="flex justify-between p-5 text-xl font-bold">
                                 <div>Total price</div>
                                 <div>
-                                    <p>{selectValue} MATIC</p>
+                                    <p>{state.selectValue} MATIC</p>
                                 </div>
                             </div>
                             <div className="grid justify-center ">
                                 <button
                                     className="bg-[#27AE60] rounded-2xl hover:bg-[#219151] p-4 px-20 w-full text-white border-r-2"
                                     onClick={buyMultipleNFTs}
-                                    disabled={minLoading}
+                                    disabled={state.isMinLoading}
                                 >
-                                    {minLoading ? (
+                                    {state.isMinLoading ? (
                                         <div className="flex justify-center px-12 py-1">
                                             <PulseLoader color="#fff" />
                                         </div>

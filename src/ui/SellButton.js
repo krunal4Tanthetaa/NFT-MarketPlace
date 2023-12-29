@@ -2,22 +2,14 @@ import { MdSell } from "react-icons/md";
 import { useNFTdata } from "../Context/NFTdata";
 import MiniLoader from "./Miniloader";
 
-function SellButton({ id }) {
-    const {
-        setListSale,
-        listSale,
-        wait,
-        setTokenId,
-        oneNFTdata: data,
-        handleListForSale,
-    } = useNFTdata();
+function SellButton() {
+    const { dispatch, state, handleListForSale } = useNFTdata();
 
     function handleClick() {
-        if (listSale == true) {
+        if (state.popUpSale == true) {
             return handleListForSale();
         } else {
-            setTokenId(data.tokenId);
-            setListSale(true);
+            dispatch({ type: "sellPopup" });
         }
     }
 
@@ -25,14 +17,14 @@ function SellButton({ id }) {
         <div>
             <button
                 className="bg-[#E74C3C] rounded-xl hover:bg-[#C0392B] px-28 py-4 relative w-full"
-                disabled={wait}
+                disabled={state.wait}
                 onClick={() => handleClick()}
             >
                 <div className="absolute top-2 left-2">
                     <MdSell color="#fff" />
                 </div>
 
-                {wait ? (
+                {state.wait ? (
                     <div className="text-xl text-semibold text-center">
                         <MiniLoader />
                     </div>

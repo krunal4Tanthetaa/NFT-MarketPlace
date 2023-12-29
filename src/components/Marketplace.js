@@ -7,8 +7,7 @@ import Loading from "../ui/Loading";
 import MainDiv from "../ui/MainDiv";
 
 export default function Marketplace() {
-    const { AllNft, isConnected, setOneNFTdata, setEditPopup, editPopup } =
-        useNFTdata();
+    const { state, isConnected, dispatch } = useNFTdata();
 
     return (
         <>
@@ -19,7 +18,7 @@ export default function Marketplace() {
 
                 <div className="max-w-full p-10 ">
                     <div className="">
-                        {AllNft.length === 0 ? (
+                        {state.AllNft.length === 0 ? (
                             isConnected ? (
                                 <Loading />
                             ) : (
@@ -36,12 +35,17 @@ export default function Marketplace() {
                             <div
                                 className={`grid grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-8 gap-y-9`}
                             >
-                                {AllNft.map((value, index) => {
+                                {state.AllNft.map((value, index) => {
                                     return (
                                         <NFTTile
                                             data={value}
                                             key={index}
-                                            onClick={() => setOneNFTdata(value)}
+                                            onClick={() =>
+                                                dispatch({
+                                                    type: "setOneNFT",
+                                                    payload: value,
+                                                })
+                                            }
                                         />
                                     );
                                 })}

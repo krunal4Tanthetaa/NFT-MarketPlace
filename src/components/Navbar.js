@@ -47,18 +47,13 @@ createWeb3Modal({
 
 function Navbar() {
     const {
+        state,
+        dispatch,
         chainId,
         selectedNetworkId,
         isConnected,
         open,
         close,
-        minLoading,
-        loading,
-        setListSale,
-        selectMulNFT,
-        setSideOpen,
-        sideOpen,
-        listSale,
     } = useNFTdata();
 
     const location = useLocation();
@@ -74,15 +69,10 @@ function Navbar() {
             <div className="">
                 <div className="">
                     <div
-                        onClick={() => setListSale(false)}
-                        className={`flex justify-between items-center mt-5 opacity-90 bg-[#34495E] px-3 py-1 rounded-2xl shadow font-roboto ${
-                            loading || minLoading || sideOpen || listSale
-                                ? "opacity-50 pointer-events-none"
-                                : ""
-                        }`}
+                        className={`flex justify-between items-center mt-5 opacity-90 bg-[#34495E] px-3 py-1 rounded-2xl shadow font-roboto`}
                     >
                         <div className="">
-                            <Link to="/" onClick={() => setListSale(false)}>
+                            <Link to="/">
                                 <img
                                     src={fullLogo}
                                     alt=""
@@ -168,17 +158,19 @@ function Navbar() {
                                 </button>
 
                                 <button
-                                    onClick={() => setSideOpen((e) => !e)}
+                                    onClick={() =>
+                                        dispatch({ type: "sidePopup" })
+                                    }
                                     className={`${
-                                        selectMulNFT.length > 0
+                                        state.selectMulNFT.length > 0
                                             ? "bg-[#27ae5f]"
                                             : "bg-[#27AE60]"
                                     } rounded-2xl hover:bg-[#1E8449] h-12 w-12  flex justify-center items-center`}
                                 >
                                     <div className="relative">
-                                        {selectMulNFT.length > 0 ? (
+                                        {state.selectMulNFT.length > 0 ? (
                                             <div className="absolute -top-2 -right-1 bg-blue-600 rounded-full text-center p-1 text-sm leading-3">
-                                                {selectMulNFT.length}
+                                                {state.selectMulNFT.length}
                                             </div>
                                         ) : (
                                             ""
@@ -190,7 +182,7 @@ function Navbar() {
                         </div>
                     </div>
                 </div>
-                {sideOpen && <Aside />}
+                {state.popUpSide && <Aside />}
             </div>
         </>
     );

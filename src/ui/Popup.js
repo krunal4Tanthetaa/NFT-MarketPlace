@@ -2,17 +2,10 @@ import { IoMdClose } from "react-icons/io";
 import { useNFTdata } from "../Context/NFTdata";
 import { createPortal } from "react-dom";
 import { useEffect, useRef } from "react";
-import { PulseLoader } from "react-spinners";
 import SellButton from "./SellButton";
 
 function Popup() {
-    const {
-        setListSale,
-        setListPrice,
-        listPrice,
-        handleListForSale,
-        wait,
-    } = useNFTdata();
+    const { state, dispatch } = useNFTdata();
 
     const Ref = useRef();
 
@@ -20,7 +13,7 @@ function Popup() {
         function () {
             function handleClick(e) {
                 if (Ref.current && !Ref.current.contains(e.target)) {
-                    setListSale(false);
+                    dispatch({ type: "sellPopup" });
                 }
             }
 
@@ -29,7 +22,7 @@ function Popup() {
             return () =>
                 document.removeEventListener("click", handleClick, true);
         },
-        [setListSale, Ref]
+        [Ref]
     );
 
     return (
@@ -40,11 +33,7 @@ function Popup() {
                     ref={Ref}
                 >
                     <div className="text-right absolute top-5 right-5">
-                        <button
-                            onClick={() => (
-                                setListSale((list) => !list), setListPrice("")
-                            )}
-                        >
+                        <button disabled={state.wait} onClick={() => dispatch({ type: "sellPopup" })}>
                             <IoMdClose size={25} />
                         </button>
                     </div>
@@ -60,8 +49,13 @@ function Popup() {
                             <input
                                 type="number"
                                 id="price"
-                                value={listPrice}
-                                onChange={(e) => setListPrice(e.target.value)}
+                                value={state.salePrice}
+                                onChange={(e) =>
+                                    dispatch({
+                                        type: "setSalePrice",
+                                        payload: e.target.value,
+                                    })
+                                }
                                 className="rounded-xl text-black py-3 px-4 bg-indigo-50"
                                 required
                             />

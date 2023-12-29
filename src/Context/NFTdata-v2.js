@@ -1,6 +1,10 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable default-case */
-import { createContext, useContext, useEffect, useReducer } from "react";
+import {
+    createContext,
+    useContext,
+    useEffect,
+    useReducer,
+    useState,
+} from "react";
 import { useNavigate } from "react-router-dom";
 import { BrowserProvider, Contract, formatEther, parseUnits } from "ethers";
 import axios from "axios";
@@ -15,15 +19,13 @@ import { GetIpfsUrlFromPinata } from "../FetchData/utils";
 import MarketplaceJSON from "../FetchData/Marketplace.json";
 import { uploadFileToIPFS, uploadJSONToIPFS } from "../FetchData/pinata";
 import toast from "react-hot-toast";
-import { reducer , initialState } from "../Hooks/reducerHook";
 
 const nftContext = createContext();
 
+// const initialState = { name: 'Taylor', age: 42 };
 
 export const NFTdataApi = ({ children }) => {
-
-    // useReducer hook for state manegment
-    const [state, dispatch] = useReducer(reducer, initialState);
+    // const [state, dispatch] = useReducer(reducer, initialState);
 
     // Wallet connect hook
     const { isConnected, chainId, address } = useWeb3ModalAccount();
@@ -32,6 +34,40 @@ export const NFTdataApi = ({ children }) => {
     const { open, close } = useWeb3Modal();
 
     const navigate = useNavigate();
+
+    // useState Hook
+
+    // Global Loading
+    const [loading, setLoading] = useState(false);
+    const [minLoading, setMinLoading] = useState(false);
+
+    // MarketPlace All NFT
+    const [AllNft, setAllNft] = useState([]);
+    const [oneNFTdata, setOneNFTdata] = useState({});
+
+    // list NFT prosess
+    const [fileURL, setFileURL] = useState(null);
+    const [formParams, setFormParams] = useState({
+        name: "",
+        description: "",
+        price: "",
+    });
+    // connected Address All NFT
+    const [userNFT, setUserNFT] = useState([]);
+
+    //  Listing logic
+    const [listSale, setListSale] = useState(false);
+    const [listPrice, setListPrice] = useState("");
+    const [wait, setWait] = useState(false);
+    const [tokenId, setTokenId] = useState("");
+
+    // Multiple NFT login
+    const [selectMulNFT, setselectMulNFT] = useState([]);
+    const [sideOpen, setSideOpen] = useState(false);
+    const [selectValue, setSelectValue] = useState();
+
+    // Edit LISTINg logic
+    const [editPopup, setEditPopup] = useState(false);
 
     async function MarketPlaceContract() {
         const provider = new BrowserProvider(walletProvider);
@@ -48,7 +84,7 @@ export const NFTdataApi = ({ children }) => {
 
     async function getAllNFTs() {
         try {
-            dispatch({ type: "MiniLoad" });
+            setLoading(true);
             const contract = await MarketPlaceContract();
 
             // create an NFT Token
@@ -80,19 +116,22 @@ export const NFTdataApi = ({ children }) => {
                 })
             );
 
-            dispatch({ type: "dataReceived", payload: items });
+            setAllNft(items);
+
+            setLoading(false);
         } catch (error) {
             console.log(error);
-            dispatch({ type: "LoadOff" });
         }
     }
 
     async function buyNFT(price, _tokenId) {
         try {
-            dispatch({ type: "MiniLoad" });
+            setMinLoading(true);
             const contract = await MarketPlaceContract();
 
             const salePrice = parseUnits(price.toString(), "ether");
+
+            console.log(tokenId, salePrice, contract);
 
             //run the executeSale function
             let transaction = await contract.executeSale(_tokenId, {
@@ -100,21 +139,27 @@ export const NFTdataApi = ({ children }) => {
                 gasLimit: 20000000,
             });
 
-            dispatch({ type: "transactionWait" });
+            setMinLoading(false);
+            setLoading(true);
             await transaction.wait();
 
+            toast.success("You successfully bought the NFT!");
+            setLoading(false);
+
+            // const abc = await getAllNFTs();
+            // const aaa = await userNFTdata();
             await getAllNFTs();
             await userNFTdata();
 
-            dispatch({ type: "transactionSuccess" });
-            toast.success("You successfully bought the NFT!");
-
+            // if (abc && aaa) {
             navigate("/profile");
+            // }
         } catch (error) {
-            dispatch({ type: "transactionFail" });
-
             if (error.reason == "rejected") {
                 toast.error(`Error message ${error.reason}`);
+                setListPrice("");
+                setMinLoading(false);
+                setLoading(false);
             } else {
                 console.log(error);
                 toast.error(`Error message ${error.reason}`);
@@ -124,34 +169,38 @@ export const NFTdataApi = ({ children }) => {
 
     async function onChangeFile(e) {
         let file = e.target.files[0];
-
-        dispatch({ type: "LoadWait" });
+        setWait(true);
 
         try {
             const response = await uploadFileToIPFS(file);
             if (response.success === true) {
                 console.log("Uploaded image to pinata:", response.pinataURL);
-
-                dispatch({ type: "FileReceived", payload: response.pinataURL });
+                setFileURL(response.pinataURL);
+                setWait(false);
             }
         } catch (e) {
             console.log("Error during file upload", e);
             toast.error(`Upload Image error ${e.message}`);
-
-            dispatch({ type: "FileFailed" });
+            setFormParams({
+                name: "",
+                description: "",
+                price: "",
+            });
+            setWait(false);
+            setMinLoading(false);
         }
     }
 
     async function uploadMetadataToIPFS() {
-        const { name, description, price } = state.formParams;
+        const { name, description, price } = formParams;
 
-        if (!name || !description || !price || !state.fileURL) return;
+        if (!name || !description || !price || !fileURL) return;
 
         const nftJSON = {
             name,
             description,
             price,
-            image: state.fileURL,
+            image: fileURL,
         };
 
         try {
@@ -167,50 +216,62 @@ export const NFTdataApi = ({ children }) => {
 
     async function listNFT(e) {
         e.preventDefault();
-        dispatch({ type: "Load" });
+        setMinLoading(true);
 
         try {
             const metadataURL = await uploadMetadataToIPFS();
 
             const contract = await MarketPlaceContract();
 
-            const price = parseUnits(state.formParams.price, 18);
+            const price = parseUnits(formParams.price, 18);
             let listingPrice = await contract.getListPrice();
             listingPrice = listingPrice.toString();
 
             let transaction = await contract.createToken(metadataURL, price, {
                 value: listingPrice,
             });
-
-            dispatch({ type: "transactionWait" });
-
+            setMinLoading(false);
+            setLoading(true);
             await transaction.wait();
 
-            await getAllNFTs();
-            await userNFTdata();
-
             toast.success("Successfully listed your NFT!");
-            dispatch({ type: "transactionSuccess" });
+
+            setLoading(false);
+            setFormParams({ name: "", description: "", price: "" });
+            setFileURL(null);
+            await userNFTdata();
+            await getAllNFTs();
+
             navigate("/profile");
         } catch (error) {
-            dispatch({ type: "transactionFail" });
-            navigate("/Profile");
-
+            setFileURL(null);
             console.log(error);
             if (error.reason == "rejected") {
                 toast.error(`Error message ${error.reason}`);
+                setListPrice("");
+                setWait(false);
             } else {
                 toast.error("Error on Uploading NFT Please try later..");
+
+                userNFTdata();
+                getAllNFTs();
+                setLoading(false);
+                setMinLoading(false);
+                navigate("/Profile");
             }
         }
     }
 
     async function userNFTdata() {
         try {
-            dispatch({ type: "Load" });
+            setLoading(true);
             const contract = await MarketPlaceContract();
-
+            //create an NFT Token
             let transaction = await contract.getMyNFTs();
+            /*
+             * Below function takes the metadata from tokenURI and the data returned by getMyNFTs() contract function
+             * and creates an object of information that is to be displayed
+             */
 
             const items = await Promise.all(
                 transaction.map(async (i) => {
@@ -233,154 +294,136 @@ export const NFTdataApi = ({ children }) => {
                 })
             );
 
-            dispatch({ type: "UserdataReceived", payload: items });
+            setUserNFT(items);
+            setLoading(false);
         } catch (error) {
             console.log(error);
-            dispatch({ type: "LoadOff" });
+            setLoading(false);
         }
     }
 
     async function handleListForSale() {
-        if (!state.salePrice) return;
+        if (!listPrice) return;
 
         try {
-            dispatch({ type: "LoadWait" });
+            setWait(true);
 
-            console.log("token Id", state.tokenId);
+            console.log("token Id", tokenId);
 
             const contract = await MarketPlaceContract();
 
             let listingPrice = await contract.getListPrice();
             listingPrice = listingPrice.toString();
 
-            const price = parseUnits(state.salePrice, 18);
+            const price = parseUnits(listPrice, 18);
+            console.log(contract, tokenId, price, listingPrice);
 
-            let transaction = await contract.ListingToSale(
-                state.tokenId,
-                price,
-                {
-                    value: listingPrice,
-                }
-            );
-
-            dispatch({ type: "transactionWait" });
-
+            let transaction = await contract.ListingToSale(tokenId, price, {
+                value: listingPrice,
+            });
+            setMinLoading(false);
+            setLoading(true);
+            setListSale(false);
             await transaction.wait();
 
+            toast.success("Successfully listed your NFT!");
+            setWait(false);
+            setLoading(false);
+            setListPrice("");
             await userNFTdata();
             await getAllNFTs();
 
-            toast.success("Successfully listed your NFT!");
-
-            dispatch({ type: "transactionSuccess" });
-
             navigate("/profile");
+            //    window.location.reload("/profile");
         } catch (error) {
             console.log(error);
-            dispatch({ type: "handleListFailed" });
-            // setListPrice("");
-            // setWait(false);
             if (error.reason == "rejected") {
                 toast.error(`Error message ${error.reason}`);
+                setListPrice("");
+                setWait(false);
             } else {
-                toast.error("something went wrong please try later..");
+                toast.success("something went wrong please try later..");
             }
         }
     }
 
     async function unlistNFT(_tokenId) {
         try {
-            dispatch({ type: "MiniLoad" });
+            setMinLoading(true);
 
             const contract = await MarketPlaceContract();
             console.log(_tokenId);
             //create an NFT Token
             let transaction = await contract.unlistNFT(_tokenId);
 
-            dispatch({ type: "transactionWait" });
-
+            setLoading(true);
+            setEditPopup(false);
             await transaction.wait();
-
-            await getAllNFTs();
-            await userNFTdata();
             toast.success("succesfully unlist NFT");
 
-            dispatch({ type: "unListTransaction" });
+            setTokenId(0);
+            await getAllNFTs();
+            await userNFTdata();
+            setLoading(false);
+            setMinLoading(false);
 
             navigate("/profile");
         } catch (error) {
             console.log(error);
-            dispatch({ type: "unListTransaction" });
+            setLoading(false);
+            setMinLoading(false);
+            setTokenId(0);
             toast.error("something went wrong");
         }
     }
 
     async function buyMultipleNFTs() {
-        if (state.selectMulNFT.length == 0) return;
+        if (selectMulNFT.length == 0) return;
 
         try {
-            dispatch({ type: "MiniLoad" });
+            setMinLoading(true);
             const contract = await MarketPlaceContract();
 
-            let AllId = [];
-            state.selectMulNFT.map((nft) => AllId.push(nft.tokenId));
+            console.log(selectValue);
 
-            const salePrice = parseUnits(state.selectValue.toString(), 18);
+            let AllId = [];
+            selectMulNFT.map((nft) => AllId.push(nft.tokenId));
+
+            // console.log(TotalValue);
+
+            const salePrice = parseUnits(selectValue.toString(), 18);
             console.log(salePrice);
 
+            // console.log(salePrice);
+            // // //run the executeSale function
             let transaction = await contract.buyMultipleNFTs(AllId, {
                 value: salePrice,
             });
 
-            dispatch({ type: "transactionWait" });
-
+            setSideOpen(false);
+            setMinLoading(false);
+            setLoading(true);
             await transaction.wait();
 
+            toast.success("You successfully bought the NFT!");
+            setselectMulNFT([]);
+            setSelectValue(0);
+            setLoading(false);
+            setMinLoading(false);
+            setSideOpen(false);
             await getAllNFTs();
             await userNFTdata();
 
-            toast.success("You successfully bought the NFT!");
-
-            dispatch({ type: "MultiNFTTransaction" });
-
             navigate("/profile");
         } catch (error) {
-            dispatch({ type: "MultiNFTTransaction" });
+            setselectMulNFT([]);
+            setListPrice("");
+            setMinLoading(false);
+            setLoading(false);
 
             toast.error(`Error message ${error.reason}`);
 
             console.log(error);
-        }
-    }
-
-    async function setNewPrice(_tokenId) {
-
-        if(!state.salePrice) return
-
-        try {
-            dispatch({ type: "LoadWait" });
-
-            const contract = await MarketPlaceContract();
-
-            const price = parseUnits(state.salePrice, 18);
-
-            let transaction = await contract.EditPrice(_tokenId , price);
-
-            dispatch({ type: "transactionWait" });
-
-            await transaction.wait();
-
-            await getAllNFTs();
-            await userNFTdata();
-            toast.success("succesfully Edit Price");
-
-            dispatch({ type: "unListTransaction" });
-
-            navigate("/profile");
-        } catch (error) {
-            console.log(error);
-            dispatch({ type: "unListTransaction" });
-            toast.error("something went wrong");
         }
     }
 
@@ -389,17 +432,18 @@ export const NFTdataApi = ({ children }) => {
             getAllNFTs();
             userNFTdata();
         }
-    }, [isConnected, selectedNetworkId, chainId, address]);
+    }, [isConnected, selectedNetworkId, chainId]);
 
     useEffect(() => {
-        dispatch({ type: "setSelectValue" });
-    }, [state.selectMulNFT]);
+        setSelectValue(0);
+        selectMulNFT.map((nft) =>
+            setSelectValue((e) => (e += Number(nft.price)))
+        );
+    }, [selectMulNFT]);
 
     return (
         <nftContext.Provider
             value={{
-                state,
-                dispatch,
                 // Functions
                 listNFT,
                 onChangeFile,
@@ -410,7 +454,33 @@ export const NFTdataApi = ({ children }) => {
                 buyMultipleNFTs,
                 buyNFT,
                 unlistNFT,
-                setNewPrice,
+                // State Data
+                AllNft,
+                userNFT,
+                formParams,
+                loading,
+                minLoading,
+                navigate,
+                oneNFTdata,
+                listSale,
+                wait,
+                tokenId,
+                selectMulNFT,
+                sideOpen,
+                selectValue,
+                fileURL,
+                editPopup,
+                // setState data
+                setFormParams,
+                setLoading,
+                setMinLoading,
+                setOneNFTdata,
+                setListSale,
+                setListPrice,
+                setTokenId,
+                setselectMulNFT,
+                setSideOpen,
+                setEditPopup,
                 // Wallet connect hooks
                 isConnected,
                 chainId,
