@@ -78,6 +78,7 @@ export function reducer(state, action) {
                     description: "",
                     price: "",
                 },
+                fileURL: null,
                 isLoading: false,
             };
         }

@@ -48,7 +48,7 @@ export const NFTdataApi = ({ children }) => {
 
     async function getAllNFTs() {
         try {
-            dispatch({ type: "MiniLoad" });
+            dispatch({ type: "Load" });
             const contract = await MarketPlaceContract();
 
             // create an NFT Token
@@ -167,7 +167,7 @@ export const NFTdataApi = ({ children }) => {
 
     async function listNFT(e) {
         e.preventDefault();
-        dispatch({ type: "Load" });
+        dispatch({ type: "MiniLoad" });
 
         try {
             const metadataURL = await uploadMetadataToIPFS();

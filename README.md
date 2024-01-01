@@ -47,7 +47,7 @@ This repository contains the code for a decentralized NFT marketplace named NFT-
    
 ----- Contract Verification -----
 * This project is licensed under the MIT License.
-* contract verify on :-   https://mumbai.polygonscan.com/address/0xb7c3eC9dC3691408e319126b798731Af82D06121
+* contract verify on :-   https://mumbai.polygonscan.com/address/0xE2C226C34027327488E85eF6ceAB7742b9CdE367
 
   
 *** Contact
