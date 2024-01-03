@@ -2,10 +2,11 @@ import { IoMdClose } from "react-icons/io";
 import { useNFTdata } from "../Context/NFTdata";
 import { createPortal } from "react-dom";
 import { useEffect, useRef } from "react";
-import SellButton from "./SellButton";
+import MiniLoader from "./Miniloader";
+import { MdSell } from "react-icons/md";
 
-function Popup() {
-    const { state, dispatch } = useNFTdata();
+function PopupOffer() {
+    const { state, dispatch, MakeOffer } = useNFTdata();
 
     const Ref = useRef();
 
@@ -13,7 +14,7 @@ function Popup() {
         function () {
             function handleClick(e) {
                 if (Ref.current && !Ref.current.contains(e.target)) {
-                    dispatch({ type: "sellPopup" });
+                    dispatch({ type:"setOfferPopup" });
                 }
             }
 
@@ -33,7 +34,10 @@ function Popup() {
                     ref={Ref}
                 >
                     <div className="text-right absolute top-5 right-5">
-                        <button disabled={state.wait} onClick={() => dispatch({ type: "sellPopup" })}>
+                        <button
+                            disabled={state.wait}
+                            onClick={() => dispatch({ type: "setOfferPopup" })}
+                        >
                             <IoMdClose size={25} />
                         </button>
                     </div>
@@ -49,10 +53,10 @@ function Popup() {
                             <input
                                 type="number"
                                 id="price"
-                                value={state.salePrice}
+                                value={state.offerPrice}
                                 onChange={(e) =>
                                     dispatch({
-                                        type: "setSalePrice",
+                                        type: "setOfferPrice",
                                         payload: e.target.value,
                                     })
                                 }
@@ -61,7 +65,25 @@ function Popup() {
                             />
                         </div>
                         <div className="text-center m-5">
-                            <SellButton />
+                            <button
+                                className="bg-[#376899] rounded-xl hover:bg-[#385c80] px-28 py-4 relative w-full"
+                                onClick={() => MakeOffer()}
+                                disabled={state.wait}
+                            >
+                                <div className="absolute top-2 left-2">
+                                    <MdSell color="#fff" />
+                                </div>
+
+                                {state.wait ? (
+                                    <div className="text-xl text-semibold text-center">
+                                        <MiniLoader />
+                                    </div>
+                                ) : (
+                                    <div className="text-xl text-semibold text-center text-white">
+                                        Make offer
+                                    </div>
+                                )}
+                            </button>
                         </div>
                     </div>
                 </div>,
@@ -71,4 +93,4 @@ function Popup() {
     );
 }
 
-export default Popup;
+export default PopupOffer;

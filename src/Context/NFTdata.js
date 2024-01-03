@@ -15,13 +15,11 @@ import { GetIpfsUrlFromPinata } from "../FetchData/utils";
 import MarketplaceJSON from "../FetchData/Marketplace.json";
 import { uploadFileToIPFS, uploadJSONToIPFS } from "../FetchData/pinata";
 import toast from "react-hot-toast";
-import { reducer , initialState } from "../Hooks/reducerHook";
+import { reducer, initialState } from "../Hooks/reducerHook";
 
 const nftContext = createContext();
 
-
 export const NFTdataApi = ({ children }) => {
-
     // useReducer hook for state manegment
     const [state, dispatch] = useReducer(reducer, initialState);
 
@@ -303,6 +301,7 @@ export const NFTdataApi = ({ children }) => {
 
             await getAllNFTs();
             await userNFTdata();
+            await AllOffer();
             toast.success("succesfully unlist NFT");
 
             dispatch({ type: "unListTransaction" });
@@ -338,6 +337,7 @@ export const NFTdataApi = ({ children }) => {
 
             await getAllNFTs();
             await userNFTdata();
+            await AllOffer();
 
             toast.success("You successfully bought the NFT!");
 
@@ -354,8 +354,7 @@ export const NFTdataApi = ({ children }) => {
     }
 
     async function setNewPrice(_tokenId) {
-
-        if(!state.salePrice) return
+        if (!state.salePrice) return;
 
         try {
             dispatch({ type: "LoadWait" });
@@ -364,7 +363,7 @@ export const NFTdataApi = ({ children }) => {
 
             const price = parseUnits(state.salePrice, 18);
 
-            let transaction = await contract.EditPrice(_tokenId , price);
+            let transaction = await contract.EditPrice(_tokenId, price);
 
             dispatch({ type: "transactionWait" });
 
@@ -384,10 +383,134 @@ export const NFTdataApi = ({ children }) => {
         }
     }
 
+    async function MakeOffer() {
+        if (!state.offerPrice) return;
+        try {
+            console.log(state.tokenId);
+
+            dispatch({ type: "LoadWait" });
+            const contract = await MarketPlaceContract();
+
+            const salePrice = parseUnits(state.offerPrice.toString(), "ether");
+            console.log(salePrice);
+            //run the executeSale function
+            let transaction = await contract.Makeoffer(
+                state.tokenId,
+                salePrice
+            );
+
+            dispatch({ type: "transactionWait" });
+            await transaction.wait();
+
+            await AllOffer();
+
+            dispatch({ type: "transactionSuccess" });
+            toast.success("successfully make offer");
+        } catch (error) {
+            dispatch({ type: "transactionFail" });
+
+            toast.error("something wrong try later");
+
+            if (error.reason == "rejected") {
+                toast.error(`Error message ${error.reason}`);
+            } else {
+                console.log(error);
+                toast.error(`Error message ${error.reason}`);
+            }
+        }
+    }
+
+    async function AllOffer() {
+        try {
+            dispatch({ type: "Load" });
+            const contract = await MarketPlaceContract();
+
+            let transaction = await contract.AllOffer();
+            console.log(transaction)
+
+            const items = transaction.map((i) => {
+                let price = formatEther(i.price.toString(), "ether");
+                let item = {
+                    index: i.index.toString(),
+                    price: price,
+                    isAccept: i.isAccept.toString(),
+                    from: i.buyer,
+                    tokenId: i.nftId.toString(),
+                };
+                console.log(item);
+                return item;
+            });
+
+            console.log(items);
+
+            dispatch({ type: "setOfferData", payload: items });
+
+            dispatch({ type: "LoadOff" });
+        } catch (error) {
+            console.log(error);
+            dispatch({ type: "LoadOff" });
+        }
+    }
+
+    async function AcceptOffer(_index) {
+        try {
+            dispatch({ type: "Load" });
+            const contract = await MarketPlaceContract();
+
+            let transaction = await contract.AcceptOffer(_index);
+
+            await transaction.wait();
+
+            await AllOffer();
+            dispatch({ type: "LoadOff" });
+        } catch (error) {
+            console.log(error);
+            toast.error("somthing went wrong please try later.");
+            dispatch({ type: "LoadOff" });
+        }
+    }
+
+    async function executeOfferSale(_index, _price) {
+        try {
+            dispatch({ type: "Load" });
+            const contract = await MarketPlaceContract();
+
+            const salePrice = parseUnits(_price.toString(), "ether");
+
+            //run the executeSale function
+            let transaction = await contract.executeOfferSale(_index, {
+                value: salePrice,
+                gasLimit: 20000000,
+            });
+
+            dispatch({ type: "transactionWait" });
+            await transaction.wait();
+
+            await getAllNFTs();
+            await userNFTdata();
+            await AllOffer();
+
+            dispatch({ type: "transactionSuccess" });
+            toast.success("You successfully bought the NFT!");
+
+            navigate("/profile");
+        } catch (error) {
+            dispatch({ type: "transactionFail" });
+
+            if (error.reason == "rejected") {
+                toast.error(`Error message ${error.reason}`);
+            } else {
+                console.log(error);
+                toast.error(`Error message ${error.reason}`);
+            }
+        }
+    }
+
     useEffect(() => {
         if (isConnected) {
             getAllNFTs();
             userNFTdata();
+            AllOffer();
         }
     }, [isConnected, selectedNetworkId, chainId, address]);
 
@@ -411,6 +534,9 @@ export const NFTdataApi = ({ children }) => {
                 buyNFT,
                 unlistNFT,
                 setNewPrice,
+                MakeOffer,
+                AcceptOffer,
+                executeOfferSale,
                 // Wallet connect hooks
                 isConnected,
                 chainId,

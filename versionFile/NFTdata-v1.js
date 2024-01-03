@@ -2,7 +2,6 @@ import {
     createContext,
     useContext,
     useEffect,
-    useReducer,
     useState,
 } from "react";
 import { useNavigate } from "react-router-dom";
@@ -15,9 +14,9 @@ import {
     useWeb3ModalState,
 } from "@web3modal/ethers/react";
 
-import { GetIpfsUrlFromPinata } from "../FetchData/utils";
-import MarketplaceJSON from "../FetchData/Marketplace.json";
-import { uploadFileToIPFS, uploadJSONToIPFS } from "../FetchData/pinata";
+import { GetIpfsUrlFromPinata } from "../src/FetchData/utils";
+import MarketplaceJSON from "../src/FetchData/Marketplace.json";
+import { uploadFileToIPFS, uploadJSONToIPFS } from "../src/FetchData/pinata";
 import toast from "react-hot-toast";
 
 const nftContext = createContext();

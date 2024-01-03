@@ -15,11 +15,14 @@ export const initialState = {
     popUpSale: false,
     popUpSide: false,
     popUpEdit: false,
+    popUpOffer: false,
     salePrice: "",
     wait: false,
     tokenId: "",
     selectMulNFT: [],
     selectValue: 0,
+    offerPrice: "",
+    AllOffer: [],
 };
 
 export function reducer(state, action) {
@@ -51,6 +54,7 @@ export function reducer(state, action) {
                 popUpSale: false,
                 popUpEdit: false,
                 popUpSide: false,
+                popUpOffer: false
             };
         }
         case "transactionSuccess": {
@@ -65,6 +69,7 @@ export function reducer(state, action) {
                 salePrice: "",
                 wait: false,
                 isLoading: false,
+                offerPrice: ""
             };
         }
         case "transactionFail": {
@@ -80,6 +85,7 @@ export function reducer(state, action) {
                 },
                 fileURL: null,
                 isLoading: false,
+                offerPrice: ""
             };
         }
         case "popUpClose": {
@@ -194,6 +200,7 @@ export function reducer(state, action) {
             return {
                 ...state,
                 oneNFT: action.payload,
+                tokenId: action.payload.tokenId
             };
         }
         case "setSalePopup": {
@@ -207,6 +214,13 @@ export function reducer(state, action) {
             return {
                 ...state,
                 popUpEdit: true,
+                tokenId: action.payload,
+            };
+        }
+        case "setOfferPopup": {
+            return {
+                ...state,
+                popUpOffer: !state.popUpOffer,
                 tokenId: action.payload,
             };
         }
@@ -239,6 +253,18 @@ export function reducer(state, action) {
                 ...state,
                 salePrice: action.payload,
             };
+        }
+        case "setOfferPrice": {
+            return {
+                ...state,
+                offerPrice: action.payload,
+            };
+        }
+        case "setOfferData": {
+            return {
+                ...state,
+                AllOffer: action.payload,
+            }
         }
     }
     throw Error("Unknown action: " + action.type);

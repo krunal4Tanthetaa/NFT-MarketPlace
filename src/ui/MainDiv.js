@@ -9,7 +9,8 @@ function MainDiv({ children, gap = 0 }) {
                 state.popUpSide ||
                 state.isLoading ||
                 state.popUpSale ||
-                state.popUpEdit
+                state.popUpEdit ||
+                state.popUpOffer
                     ? "blur-sm opacity-50 pointer-events-none"
                     : ""
             }`}

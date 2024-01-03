@@ -1,4 +1,4 @@
-//SPDX-License-Identifier: MIT
+//SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.0;
 
 import "hardhat/console.sol";
@@ -6,28 +6,17 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 
-contract NFTMarketplace_New is ERC721URIStorage {
+contract NFTMarketplace is ERC721URIStorage {
 
     using Counters for Counters.Counter;
     //_tokenIds variable has the most recent minted tokenId
     Counters.Counter private _tokenIds;
-
-    Counters.Counter private OfferIds;
     //Keeps track of the number of items sold on the marketplace
     Counters.Counter private _itemsSold;
     //owner is the contract address that created the smart contract
     address payable owner;
     //The fee charged by the marketplace to be allowed to list an NFT
     uint256 listPrice = 0.01 ether;
-
-   // The structure to store info about a offer on NFTs.
-    struct OfferInfo {
-        uint256 index;
-        uint256 nftId;
-        address buyer;
-        uint256 price;
-        bool isAccept;
-    }
 
     //The structure to store info about a listed token
     struct ListedToken {
@@ -47,11 +36,8 @@ contract NFTMarketplace_New is ERC721URIStorage {
         bool currentlyListed
     );
 
-
     //This mapping maps tokenId to token info and is helpful when retrieving details about a tokenId
-    mapping(uint256 => ListedToken) public idToListedToken;
-
-    OfferInfo[] public offerInfo;
+    mapping(uint256 => ListedToken) private idToListedToken;
 
     constructor() ERC721("NFTMarketplace", "NFTM") {
         owner = payable(msg.sender);
@@ -99,7 +85,7 @@ contract NFTMarketplace_New is ERC721URIStorage {
 
     function createListedToken(uint256 tokenId, uint256 price) private {
         //Make sure the sender sent enough ETH to pay for listing
-        require(msg.value >= listPrice, "Hopefully sending the correct price");
+        require(msg.value == listPrice, "Hopefully sending the correct price");
         //Just sanity check
         require(price > 0, "Make sure the price isn't negative");
 
@@ -177,7 +163,7 @@ contract NFTMarketplace_New is ERC721URIStorage {
         require(msg.value >= price, "Please submit the asking price in order to complete the purchase");
 
         _transfer(address(this), msg.sender, tokenId);
-
+        //approve the marketplace to sell NFTs on your behalf
         payable(preOwner).transfer(msg.value);
 
 
@@ -189,141 +175,13 @@ contract NFTMarketplace_New is ERC721URIStorage {
             currentlyListed: false
         });
 
-
     }
+
 
     function ListingToSale(uint _tokenId, uint _price) external payable {
        require(_tokenId <= _tokenIds.current(), "Please ender valid tokenId");
        require(ownerOf(_tokenId) == msg.sender, "you are not owner of this Token");
          createListedToken(_tokenId, _price);
     }
-
-    function buyMultipleNFTs(uint256[] memory _MultitokenIds) external payable {
-        uint256 TotalValue;
-
-        for (uint i = 0; i < _MultitokenIds.length; i++) {
-            require(idToListedToken[_MultitokenIds[i]].currentlyListed == true, "Please check tokenIds valid or not.");
-            TotalValue += idToListedToken[_MultitokenIds[i]].price;
-        }
-
-        require(msg.value >= TotalValue, "value is not enough to buy NFT.");
-
-         for (uint i = 0; i < _MultitokenIds.length; i++) {
-
-            uint Token = _MultitokenIds[i];
-
-             _transfer(address(this), msg.sender, Token);
-
-             uint price = idToListedToken[Token].price;
-             address preOwner = idToListedToken[Token].owner;
-
-             payable(preOwner).transfer(price);
-
-            idToListedToken[Token] = ListedToken({
-            tokenId : Token,
-            owner: payable(msg.sender),
-            seller: payable(address(0)),
-            price: 0,
-            currentlyListed: false
-        });
-
-
-        }
-
-    }
-
-    function unlistNFT(uint256 tokenId) external {
-
-        ListedToken memory listToken = idToListedToken[tokenId];
-
-         require(listToken.currentlyListed, "This NFT is not for sale" );
-         require(msg.sender == listToken.owner, "only owner can call this function");
-
-         _transfer(address(this), msg.sender, tokenId);
-
-
-        idToListedToken[tokenId] = ListedToken({
-            tokenId : tokenId,
-            owner: payable(msg.sender),
-            seller: payable(address(0)),
-            price: 0,
-            currentlyListed: false
-        });
-
-    }
-
-    function EditPrice(uint256 tokenId, uint256 _NewPrice) external {
-
-         ListedToken storage listToken = idToListedToken[tokenId];
-
-         require(listToken.currentlyListed, "This NFT is not for sale" );
-         require(msg.sender == listToken.owner, "only owner can call this function");
-
-         listToken.price = _NewPrice;
-    }
-
-    function withDraw() external {
-        require(msg.sender == owner, "only marketplace owner can call this function.");
-
-        payable(owner).transfer(address(this).balance);
-    }
-
-    function Makeoffer(uint256 tokenId,uint256 _price) external {
-
-        require(_tokenIds.current() >= tokenId && _price > 0 , "Invalid offer Data." );
-        
-        OfferIds.increment();
-        offerInfo.push(OfferInfo({
-            index: OfferIds.current(),
-            nftId: tokenId,
-            buyer: msg.sender,
-            price: _price,
-            isAccept: false
-        }));
-    }
-
-    function AcceptOffer(uint256 _index) external {
-
-    ///  aa mapping ma karva nu che atle ke offerInfo ne array mathi kadhi ne mapping ma fervva nu che . ok 
-        OfferInfo storage Info = offerInfo[_index];
-
-        require(idToListedToken[Info.nftId].owner == msg.sender, "only owner can Accept offer."); 
-
-         if(ownerOf(Info.nftId) != address(this)) {
-            approve(address(this),  Info.nftId);
-         }
-
-       Info.isAccept = true;
-    }
-
-    function executeOfferSale(uint256 _index) external payable  {
-
-        OfferInfo memory Info = offerInfo[_index];
-        require(Info.isAccept == true , "offer is not Accept at.");
-        require(Info.buyer == msg.sender, "This offer is only for one buyer who make this offer.");
-
-        require(msg.value >= Info.price, "Please submit the asking price in order to complete the purchase");
-
-        if(ownerOf(Info.nftId) == address(this)) {
-             _transfer(address(this), msg.sender, Info.nftId);
-        } else {
-            _transfer(ownerOf(Info.nftId), msg.sender, Info.nftId);
-        }
-
-        payable(ownerOf(Info.nftId)).transfer(msg.value);
-
-        idToListedToken[Info.nftId] = ListedToken({
-            tokenId : Info.nftId,
-            owner: payable(msg.sender),
-            seller: payable(address(0)),
-            price: 0,
-            currentlyListed: false
-        });
-
-        offerInfo[_index] = offerInfo[offerInfo.length - 1];
-        // Remove the last element
-        offerInfo.pop();
-    }
-
 
 }

@@ -9,9 +9,9 @@ function BuyButton() {
     const { buyNFT, state, dispatch } = useNFTdata();
 
     return (
-        <div className="flex">
+        <div className="flex w-1/2">
             <button
-                className="bg-[#27AE60] rounded-xl hover:bg-[#219151] p-4  w-96 rounded-r-none border-r-2 text-[#FFFFFF]"
+                className="bg-[#27AE60] rounded-xl hover:bg-[#219151] p-4 w-11/12 rounded-r-none border-r-2 text-[#FFFFFF]"
                 onClick={() => buyNFT(state.oneNFT.price, state.oneNFT.tokenId)}
                 disabled={state.isLoading}
             >
@@ -31,7 +31,7 @@ function BuyButton() {
                 onClick={() =>
                     dispatch({ type: "addMulNFT", payload: state.oneNFT })
                 }
-                className={`bg-[#27AE60] rounded-2xl hover:bg-[#219151]  p-4 w-46 rounded-l-none text-[#FFFFFF]`}
+                className={`bg-[#27AE60] rounded-2xl hover:bg-[#219151]  p-4  rounded-l-none text-[#FFFFFF]`}
             >
                 {state.selectMulNFT.includes(state.oneNFT) ? (
                     <MdOutlineRemoveShoppingCart size={30} />
