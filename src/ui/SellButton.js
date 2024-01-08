@@ -16,7 +16,7 @@ function SellButton() {
     return (
         <div>
             <button
-                className="bg-[#E74C3C] rounded-xl hover:bg-[#C0392B] px-28 py-4 relative w-full"
+                className="bg-[#E74C3C] rounded-xl hover:bg-[#C0392B]  px-28 py-4 relative w-full"
                 disabled={state.wait}
                 onClick={() => handleClick()}
             >

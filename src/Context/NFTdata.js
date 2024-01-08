@@ -10,7 +10,6 @@ import {
     useWeb3ModalProvider,
     useWeb3ModalState,
 } from "@web3modal/ethers/react";
-
 import { GetIpfsUrlFromPinata } from "../FetchData/utils";
 import MarketplaceJSON from "../FetchData/Marketplace.json";
 import { uploadFileToIPFS, uploadJSONToIPFS } from "../FetchData/pinata";

@@ -33,7 +33,7 @@ export default function Marketplace() {
                             )
                         ) : (
                             <div
-                                className={`grid grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-8 gap-y-9`}
+                                className={`grid grid-cols-4 min-[1320px]:grid-cols-4 min-[1490px]:grid-cols-5 min-[1720px]:grid-cols-6 gap-8 gap-y-9`}
                             >
                                 {state.AllNft.map((value, index) => {
                                     return (

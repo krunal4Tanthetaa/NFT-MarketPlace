@@ -27,7 +27,7 @@ export default function Profile() {
                     </div>
                 </div>
                 <div className="max-w-full p-10 pt-4">
-                    <div className="grid grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-8 gap-y-9">
+                    <div className="grid grid-cols-4 min-[1320px]:grid-cols-4 min-[1450px]:grid-cols-5 2xl:grid-cols-6 gap-8 gap-y-9">
                         {state.ProfileNFT.map((value, index) => {
                             return (
                                 <NFTTile

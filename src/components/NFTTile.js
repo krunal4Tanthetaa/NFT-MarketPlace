@@ -22,7 +22,7 @@ function NFTTile({ data, forSale = true, onClick }) {
                             <img
                                 src={IPFSUrl ? IPFSUrl : ""}
                                 alt=""
-                                className="w-full h-full border border-[#3498DB] rounded-lg object-cover hover:scale-125 transition duration-500 cursor-pointer"
+                                className="w-full h-full border border-[#21738b4b] rounded-lg object-cover hover:scale-110 transition duration-500 cursor-pointer"
                             />
                         </Link>
                         <div className=" w-full p-2 bg-gradient-to-t from-[#454545] to-transparent rounded-lg pt-5 -mt-20 text-center ">
