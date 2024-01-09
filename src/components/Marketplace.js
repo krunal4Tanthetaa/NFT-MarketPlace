@@ -20,7 +20,7 @@ export default function Marketplace() {
                     <div className="">
                         {state.AllNft.length === 0 ? (
                             isConnected ? (
-                                <Loading />
+                                <Loading isTrue={true} />
                             ) : (
                                 <div className="text-center flex flex-col gap-5 font-roboto text-2xl text-[#fdfdfd]">
                                     <p className="font-sans font-bold">

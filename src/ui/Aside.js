@@ -88,7 +88,7 @@ function Aside() {
                             )}
                             {state.selectMulNFT.map((nft) => {
                                 return (
-                                    <div className="p-2 flex rounded-lg gap-5 items-center group hover:bg-[#ffffff60] hover:drop-shadow-sm shadow-[#000]">
+                                    <div className="p-2 flex rounded-lg gap-5 items-center group hover:bg-[#ffffff9f] hover:drop-shadow-sm shadow-[#000]">
                                         <div className="shadow-xl h-20 w-20 overflow-hidden rounded-xl">
                                             <img
                                                 src={nft.image}

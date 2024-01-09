@@ -1,5 +1,4 @@
 import { MdOutlineLocalOffer } from "react-icons/md";
-import MiniLoader from "./Miniloader";
 import { useNFTdata } from "../Context/NFTdata";
 
 function OfferButton() {
@@ -15,21 +14,15 @@ function OfferButton() {
                         payload: state.oneNFT.tokenId,
                     })
                 }
-                disabled={state.isLoading}
+                disabled={state.isLoading || state.isMinLoading}
             >
-                {state.isMinLoading ? (
-                    <div className="flex gap-5 justify-center">
-                        <MiniLoader />
+                <div className="flex gap-5 justify-center text-lg font-bold">
+                    <div>
+                        <h1 className="tracking-wider flex justify-center items-center gap-3">
+                            <MdOutlineLocalOffer size={25} /> Make offer
+                        </h1>
                     </div>
-                ) : (
-                    <div className="flex gap-5 justify-center text-lg font-bold">
-                        <div>
-                            <h1 className="tracking-wider flex justify-center items-center gap-3">
-                                <MdOutlineLocalOffer size={25} /> Make offer
-                            </h1>
-                        </div>
-                    </div>
-                )}
+                </div>
             </button>
         </div>
     );
