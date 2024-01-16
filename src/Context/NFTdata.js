@@ -4,16 +4,17 @@ import { createContext, useContext, useEffect, useReducer } from "react";
 import { useNavigate } from "react-router-dom";
 import { BrowserProvider, Contract, formatEther, parseUnits } from "ethers";
 import axios from "axios";
+import toast from "react-hot-toast";
 import {
     useWeb3Modal,
     useWeb3ModalAccount,
     useWeb3ModalProvider,
     useWeb3ModalState,
 } from "@web3modal/ethers/react";
+
 import { GetIpfsUrlFromPinata } from "../FetchData/utils";
 import MarketplaceJSON from "../FetchData/Marketplace.json";
 import { uploadFileToIPFS, uploadJSONToIPFS } from "../FetchData/pinata";
-import toast from "react-hot-toast";
 import { reducer, initialState } from "../Hooks/reducerHook";
 
 const nftContext = createContext();
@@ -425,7 +426,7 @@ export const NFTdataApi = ({ children }) => {
             const contract = await MarketPlaceContract();
 
             let transaction = await contract.AllOffer();
-            console.log(transaction)
+            console.log(transaction);
 
             const items = transaction.map((i) => {
                 let price = formatEther(i.price.toString(), "ether");
@@ -505,11 +506,23 @@ export const NFTdataApi = ({ children }) => {
         }
     }
 
+    const scrollToTop = () => {
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth",
+        });
+    };
+
+    useEffect(() => {
+        scrollToTop();
+    }, [state.oneNFT]);
+
     useEffect(() => {
         if (isConnected) {
             getAllNFTs();
             userNFTdata();
             AllOffer();
+            dispatch({ type: "clearMulNFT" });
         }
     }, [isConnected, selectedNetworkId, chainId, address]);
 

@@ -35,7 +35,7 @@ function Aside() {
         <>
             {createPortal(
                 <div
-                    className={`h-screen  2xl:w-1/4 absolute top-0 right-0 grid justify-items-end p-8 text-[#333333] ${
+                    className={`h-screen  2xl:w-1/4 absolute top-0 right-0 grid justify-items-end p-8 text-[#333333] transition duration-700 ${
                         state.isMinLoading
                             ? "opacity-80 pointer-events-none"
                             : ""
@@ -88,7 +88,7 @@ function Aside() {
                             )}
                             {state.selectMulNFT.map((nft) => {
                                 return (
-                                    <div className="p-2 flex rounded-lg gap-5 items-center group hover:bg-[#ffffff9f] hover:drop-shadow-sm shadow-[#000]">
+                                    <div className="p-2 flex rounded-lg gap-5 items-center group hover:bg-[#ffffff9f] hover:drop-shadow-sm shadow-[#000] transition duration-700">
                                         <div className="shadow-xl h-20 w-20 overflow-hidden rounded-xl">
                                             <img
                                                 src={nft.image}
@@ -152,7 +152,7 @@ function Aside() {
                                 <button
                                     className="bg-[#27AE60] rounded-2xl hover:bg-[#219151] p-4 px-20 w-full text-white border-r-2"
                                     onClick={buyMultipleNFTs}
-                                    disabled={state.isMinLoading}
+                                    disabled={state.isMinLoading || state.selectMulNFT.length == 0}
                                 >
                                     {state.isMinLoading ? (
                                         <div className="flex justify-center px-12 py-1">

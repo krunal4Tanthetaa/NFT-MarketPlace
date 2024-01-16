@@ -39,7 +39,7 @@ function NFTDetail() {
                 >
                     <div className="flex gap-3  font-extrabold text-xl">
                         <TfiMenuAlt size={25} />
-                        <h1> Offers</h1>
+                        <h1 className="select-none"> Offers</h1>
                     </div>
                     <div>
                         {dropDown ? (
@@ -54,7 +54,7 @@ function NFTDetail() {
                         dropDown == true ? "visible " : "invisible"
                     }`}
                 >
-                    <div className="grid grid-cols-5 border-b gap-5 justify-items-center p-1 text-[#9e9d9d] text-lg drop-shadow ">
+                    <div className="grid grid-cols-5 border-b gap-5 justify-items-center p-1 text-[#9e9d9d] text-lg drop-shadow select-none">
                         <h1>Price</h1>
                         <h1>Floor Difference</h1>
                         <h1>Quantity</h1>
